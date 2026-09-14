@@ -1,7 +1,22 @@
 {
-  "name": "voice-a",
+  "name": "voice-agent",
   "version": "0.1.0",
   "private": true,
+  "description": "Real-time voice and conversational AI for field work, healthcare, dispatch, and customer support.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/whizzel/Voice-Agent.git"
+  },
+  "homepage": "https://github.com/whizzel/Voice-Agent",
+  "bugs": {
+    "url": "https://github.com/whizzel/Voice-Agent/issues"
+  },
+  "keywords": [
+    "voice-agent",
+    "conversational-ai",
+    "real-time-ai",
+    "retrieval"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
