@@ -1,6 +1,5 @@
 "use client"
 
-import dynamic from "next/dynamic"
 import { useCallback, useEffect, useState } from "react"
 import {
   ConversationProvider,
@@ -22,13 +21,9 @@ import {
   ConversationContent,
 } from "@/components/voice/conversation"
 import { Message, MessageContent } from "@/components/voice/message"
+import { Orb } from "@/components/voice/orb"
 import { Response } from "@/components/voice/response"
 import { ShimmeringText } from "@/components/voice/shimmering-text"
-
-const Orb = dynamic(
-  () => import("@/components/voice/orb").then((mod) => mod.Orb),
-  { ssr: false }
-)
 
 const AGENT_ID = process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID
 
@@ -181,7 +176,6 @@ function DispatchCopilot() {
             <div className="bg-background h-full w-full overflow-hidden rounded-full">
               <Orb
                 className="h-full w-full"
-                volumeMode="manual"
                 getInputVolume={scaledInputVolume}
                 getOutputVolume={scaledOutputVolume}
               />
