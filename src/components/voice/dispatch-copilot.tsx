@@ -6,12 +6,16 @@ import {
   useConversation,
   useConversationClientTool,
 } from "@elevenlabs/react"
+import { AnimatePresence, motion } from "motion/react"
 import {
   Loader2Icon,
+  MessageSquareTextIcon,
   MicIcon,
   MicOffIcon,
   PhoneIcon,
   PhoneOffIcon,
+  RadioTowerIcon,
+  SearchIcon,
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -151,141 +155,208 @@ function DispatchCopilot() {
   }, [isCallActive, endSession, startSession])
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center gap-12 px-6 py-16">
-      <header className="flex flex-col items-center gap-3 text-center">
-        <span className="text-muted-foreground text-xs font-medium tracking-[0.2em] uppercase">
-          Field Dispatch · Voice Agent
-        </span>
-        <h1 className="text-4xl font-semibold tracking-tight text-balance sm:text-5xl">
-          Dispatch Copilot
-        </h1>
-        <p className="text-muted-foreground max-w-md text-balance">
-          Ask a dispatch question out loud. Every answer is grounded in the
-          knowledge base entry it came from.
-        </p>
-      </header>
-
-      <div className="flex flex-col items-center gap-6">
-        <div className="relative size-56">
+    <div className="flex min-h-full flex-1 flex-col">
+      <header className="sticky top-0 z-10 border-b border-border/60 bg-background/80 backdrop-blur-md">
+        <div className="mx-auto flex w-full max-w-3xl items-center justify-between px-6 py-4">
+          <div className="flex items-center gap-2">
+            <div className="flex size-7 items-center justify-center rounded-lg bg-foreground text-background">
+              <RadioTowerIcon className="size-4" />
+            </div>
+            <span className="text-sm font-semibold tracking-tight">
+              Dispatch Copilot
+            </span>
+          </div>
           <div
             className={cn(
-              "h-full w-full rounded-full p-1.5 shadow-[inset_0_2px_10px_rgba(0,0,0,0.08)] transition-shadow duration-500 dark:shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)]",
-              isCallActive ? "bg-blue-100 dark:bg-blue-950/40" : "bg-muted"
+              "flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors",
+              isCallActive
+                ? "border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-900 dark:bg-blue-950/50 dark:text-blue-400"
+                : "border-border text-muted-foreground"
             )}
           >
-            <div className="bg-background h-full w-full overflow-hidden rounded-full">
-              <Orb
-                className="h-full w-full"
-                getInputVolume={scaledInputVolume}
-                getOutputVolume={scaledOutputVolume}
-              />
-            </div>
+            <span
+              className={cn(
+                "size-1.5 rounded-full",
+                isCallActive ? "bg-blue-500" : "bg-muted-foreground/50"
+              )}
+            />
+            {isCallActive ? "Live" : "Offline"}
           </div>
         </div>
+      </header>
 
-        <div className="flex min-h-6 items-center gap-2 text-sm">
-          {errorMessage ? (
-            <span className="text-destructive text-center">
-              {errorMessage}
-            </span>
-          ) : isConnecting ? (
-            <ShimmeringText text="Connecting…" />
-          ) : isCallActive ? (
-            <span className="flex items-center gap-2 font-medium text-blue-600 dark:text-blue-400">
-              <span className="relative flex size-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-500 opacity-75" />
-                <span className="relative inline-flex size-2 rounded-full bg-blue-500" />
-              </span>
-              {isSpeaking ? "Speaking" : "Listening"}
-            </span>
-          ) : (
-            <span className="text-muted-foreground">Tap to start a call</span>
-          )}
-        </div>
+      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center gap-12 px-6 py-16">
+        <header className="flex flex-col items-center gap-4 text-center">
+          <span className="border-border bg-card text-muted-foreground inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium">
+            <span className="size-1.5 rounded-full bg-blue-500" />
+            Field Dispatch · Voice Agent
+          </span>
+          <h1 className="text-4xl font-semibold tracking-tight text-balance sm:text-5xl">
+            Ask dispatch anything. Out loud.
+          </h1>
+          <p className="text-muted-foreground max-w-md text-balance">
+            Every answer is grounded in the knowledge base entry it came
+            from, with the retrieval time shown right next to it.
+          </p>
+        </header>
 
-        <div className="flex items-center gap-3">
-          <Button
-            onClick={handleCall}
-            disabled={isConnecting}
-            size="icon"
-            variant={isCallActive ? "secondary" : "default"}
-            className="size-14 rounded-full shadow-sm"
-          >
-            {isConnecting ? (
-              <Loader2Icon className="size-5 animate-spin" />
-            ) : isCallActive ? (
-              <PhoneOffIcon className="size-5" />
-            ) : (
-              <PhoneIcon className="size-5" />
-            )}
-          </Button>
-          {isCallActive && (
-            <Button
-              onClick={() => setMuted(!isMuted)}
-              size="icon"
-              variant="outline"
-              className="size-11 rounded-full"
+        <div className="flex flex-col items-center gap-6">
+          <div className="relative size-56">
+            <div
+              className={cn(
+                "absolute inset-0 -z-10 rounded-full blur-3xl transition-opacity duration-700",
+                isCallActive ? "bg-blue-400/40 opacity-100" : "bg-blue-300/25 opacity-60"
+              )}
+            />
+            <div
+              className={cn(
+                "h-full w-full rounded-full p-1.5 shadow-[inset_0_2px_10px_rgba(0,0,0,0.08)] transition-shadow duration-500 dark:shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)]",
+                isCallActive ? "bg-blue-100 dark:bg-blue-950/40" : "bg-muted"
+              )}
             >
-              {isMuted ? (
-                <MicOffIcon className="size-4" />
+              <div className="bg-background h-full w-full overflow-hidden rounded-full">
+                <Orb
+                  className="h-full w-full"
+                  getInputVolume={scaledInputVolume}
+                  getOutputVolume={scaledOutputVolume}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex min-h-6 items-center gap-2 text-sm">
+            {errorMessage ? (
+              <span className="text-destructive text-center">
+                {errorMessage}
+              </span>
+            ) : isConnecting ? (
+              <ShimmeringText text="Connecting…" />
+            ) : isCallActive ? (
+              <span className="flex items-center gap-2 font-medium text-blue-600 dark:text-blue-400">
+                <span className="relative flex size-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-500 opacity-75" />
+                  <span className="relative inline-flex size-2 rounded-full bg-blue-500" />
+                </span>
+                {isSpeaking ? "Speaking" : "Listening"}
+              </span>
+            ) : (
+              <span className="text-muted-foreground">
+                Tap to start a call
+              </span>
+            )}
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Button
+              onClick={handleCall}
+              disabled={isConnecting}
+              variant={isCallActive ? "secondary" : "default"}
+              className={cn(
+                "gap-2 rounded-full shadow-sm transition-all",
+                isCallActive ? "size-14 p-0" : "h-12 px-6"
+              )}
+            >
+              {isConnecting ? (
+                <Loader2Icon className="size-5 animate-spin" />
+              ) : isCallActive ? (
+                <PhoneOffIcon className="size-5" />
               ) : (
-                <MicIcon className="size-4" />
+                <>
+                  <PhoneIcon className="size-4" />
+                  Start call
+                </>
               )}
             </Button>
+            {isCallActive && (
+              <Button
+                onClick={() => setMuted(!isMuted)}
+                size="icon"
+                variant="outline"
+                className="size-11 rounded-full"
+              >
+                {isMuted ? (
+                  <MicOffIcon className="size-4" />
+                ) : (
+                  <MicIcon className="size-4" />
+                )}
+              </Button>
+            )}
+          </div>
+        </div>
+
+        <div
+          className={cn(
+            "grid w-full gap-4 overflow-hidden transition-all duration-500 ease-out sm:grid-cols-[1fr_240px]",
+            hasTranscript
+              ? "grid-rows-[1fr] opacity-100"
+              : "grid-rows-[0fr] opacity-0"
           )}
-        </div>
-      </div>
-
-      <div
-        className={cn(
-          "grid w-full gap-4 overflow-hidden transition-all duration-500 ease-out sm:grid-cols-[1fr_240px]",
-          hasTranscript
-            ? "grid-rows-[1fr] opacity-100"
-            : "grid-rows-[0fr] opacity-0"
-        )}
-      >
-        <div className="min-h-0">
-          <div className="border-border bg-card flex h-72 flex-col overflow-hidden rounded-2xl border">
-            <Conversation className="flex-1">
-              <ConversationContent>
-                {messages.map((message, index) => (
-                  <Message key={index} from={message.role}>
-                    <MessageContent>
-                      <Response>{message.content}</Response>
-                    </MessageContent>
-                  </Message>
-                ))}
-              </ConversationContent>
-            </Conversation>
-          </div>
-        </div>
-
-        <div className="min-h-0">
-          <div className="border-border bg-card h-72 space-y-3 overflow-y-auto rounded-2xl border p-4">
-            <div className="flex items-center justify-between text-xs">
-              <span className="font-medium">Knowledge lookup</span>
-              {latencyMs !== null && (
-                <span className="rounded-full bg-blue-50 px-2 py-0.5 font-medium text-blue-600 dark:bg-blue-950/50 dark:text-blue-400">
-                  {latencyMs}ms
-                </span>
-              )}
+        >
+          <div className="min-h-0">
+            <div className="border-border bg-card flex h-72 flex-col overflow-hidden rounded-2xl border shadow-sm">
+              <div className="border-border flex items-center gap-1.5 border-b px-4 py-2.5 text-xs font-medium">
+                <MessageSquareTextIcon className="text-muted-foreground size-3.5" />
+                Transcript
+              </div>
+              <Conversation className="flex-1">
+                <ConversationContent>
+                  <AnimatePresence initial={false}>
+                    {messages.map((message, index) => (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.25, ease: "easeOut" }}
+                      >
+                        <Message from={message.role}>
+                          <MessageContent>
+                            <Response>{message.content}</Response>
+                          </MessageContent>
+                        </Message>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </ConversationContent>
+              </Conversation>
             </div>
-            <ul className="space-y-2">
-              {sources.map((source) => (
-                <li
-                  key={source.id}
-                  className="bg-muted rounded-lg p-2.5 text-xs leading-relaxed"
-                >
-                  <p className="line-clamp-3">{source.text}</p>
-                  <span className="text-muted-foreground">
-                    {Math.round(source.score * 100)}% match
+          </div>
+
+          <div className="min-h-0">
+            <div className="border-border bg-card flex h-72 flex-col overflow-hidden rounded-2xl border shadow-sm">
+              <div className="border-border flex items-center justify-between border-b px-4 py-2.5 text-xs font-medium">
+                <span className="flex items-center gap-1.5">
+                  <SearchIcon className="text-muted-foreground size-3.5" />
+                  Knowledge lookup
+                </span>
+                {latencyMs !== null && (
+                  <span className="rounded-full bg-blue-50 px-2 py-0.5 font-medium text-blue-600 dark:bg-blue-950/50 dark:text-blue-400">
+                    {latencyMs}ms
                   </span>
-                </li>
-              ))}
-            </ul>
+                )}
+              </div>
+              <ul className="space-y-2 overflow-y-auto p-3">
+                {sources.map((source) => (
+                  <li
+                    key={source.id}
+                    className="bg-muted rounded-lg p-2.5 text-xs leading-relaxed"
+                  >
+                    <p className="line-clamp-3">{source.text}</p>
+                    <span className="text-muted-foreground">
+                      {Math.round(source.score * 100)}% match
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
-      </div>
+      </main>
+
+      <footer className="border-border/60 border-t px-6 py-6">
+        <p className="text-muted-foreground mx-auto max-w-3xl text-center text-xs">
+          Voice by ElevenLabs Conversational AI · Retrieval by Moss
+        </p>
+      </footer>
     </div>
   )
 }
