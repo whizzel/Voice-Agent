@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Vendored as-is from the ElevenLabs UI registry. Its imperative
+    // three.js/r3f code trips React Compiler's purity checks by design;
+    // rewriting it risks breaking the visual it renders.
+    "src/components/voice/orb.tsx",
   ]),
 ]);
 
