@@ -16,9 +16,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Voice-Agent | Real-Time Conversational AI",
+  title: "Dispatch Copilot | Real-Time Voice Agent",
   description:
-    "Real-time voice agents for field work, healthcare, dispatch, and customer support.",
+    "A voice agent for field-service dispatch. Grounded, sub-10ms knowledge retrieval on every answer, powered by ElevenLabs and Moss.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
