@@ -1,9 +1,7 @@
 import { MossClient } from "@moss-js/moss"
 
-export const MOSS_INDEX_NAME = process.env.MOSS_INDEX_NAME || "dispatch-kb"
-
 let client: MossClient | null = null
-let indexReady: Promise<unknown> | null = null
+const loadedIndexes = new Map<string, Promise<unknown>>()
 
 function getClient() {
   if (!client) {
@@ -15,9 +13,17 @@ function getClient() {
       )
     }
     client = new MossClient(projectId, projectKey)
-    indexReady = client.loadIndex(MOSS_INDEX_NAME)
   }
   return client
+}
+
+function ensureIndexLoaded(c: MossClient, indexName: string) {
+  let ready = loadedIndexes.get(indexName)
+  if (!ready) {
+    ready = c.loadIndex(indexName)
+    loadedIndexes.set(indexName, ready)
+  }
+  return ready
 }
 
 export type MossMatch = {
@@ -28,11 +34,12 @@ export type MossMatch = {
 
 export async function searchKnowledgeBase(
   query: string,
+  indexName: string,
   topK = 3
 ): Promise<MossMatch[]> {
   const c = getClient()
-  await indexReady
-  const results = await c.query(MOSS_INDEX_NAME, query, { topK })
+  await ensureIndexLoaded(c, indexName)
+  const results = await c.query(indexName, query, { topK })
   return results.docs.map((doc) => ({
     id: doc.id,
     text: doc.text,
