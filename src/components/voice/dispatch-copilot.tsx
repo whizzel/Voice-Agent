@@ -67,7 +67,11 @@ function DispatchCopilot() {
         body: JSON.stringify({ query }),
       })
       const data = await res.json()
-      if (!res.ok) return "No relevant entries found."
+      if (!res.ok) {
+        return res.status === 403
+          ? "That question was blocked by a safety check."
+          : "No relevant entries found."
+      }
 
       const docs: KbMatch[] = data.docs ?? []
       setSources(docs)
